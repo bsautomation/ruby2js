@@ -17,7 +17,7 @@ module Ruby2JS
 
       end
       
-      put name
+      put "'@#{name}'"
     end
   end
 end

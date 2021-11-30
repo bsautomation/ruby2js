@@ -39,7 +39,7 @@ module Ruby2JS
       end
 
       # strip '!' and '?' decorations
-      method = method.to_s[0..-2] if method =~ /\w[!?]$/
+      method = method.to_s[0..-2] if method =~ /\w[!?]$/ && !SELENIUM_COMMANDS.keys.include?(method)
 
       # anonymous class
       if method == :new and receiver and receiver.children == [nil, :Class] and
@@ -331,6 +331,26 @@ module Ruby2JS
       elsif ast.children[1] == :instance_of? and receiver and args.length == 1
         put '('; parse s(:send, s(:attr, receiver, :constructor), :==, args.first); put ')'
 
+      elsif SELENIUM_COMMANDS.keys.include?(method)
+        (group_receiver ? group(receiver) : parse(receiver))
+        empty_command = SELENIUM_COMMANDS[method].empty?
+        put "#{empty_command ? method : SELENIUM_COMMANDS[method] }"
+        if args.length <= 1
+          put "("; parse_all(*args, join: ', '); put ')';
+        else
+          compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
+        end
+        put ' // This method is not yet implemented' if empty_command
+
+      elsif method == :include or method.to_s.include?('include')
+        (group_receiver ? group(receiver) : parse(receiver))
+        put '.includes'
+        if args.length <= 1
+          put "("; parse_all(*args, join: ', '); put ')'
+        else
+          compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
+        end
+
       else
         if method == :bind and receiver&.type == :send
           if receiver.children.length == 2 and receiver.children.first == nil
@@ -359,6 +379,7 @@ module Ruby2JS
           else
             compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
           end
+          put " // This method is not yet implemented"
         end
 
         if autobind and not ast.is_method? and ast.type != :attr
