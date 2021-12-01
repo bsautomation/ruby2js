@@ -17,7 +17,11 @@ module Ruby2JS
 
       end
       
-      put "'@#{name}'"
+      if name.to_s.eql?('ENV')
+        put "browser.globals"
+      else
+        put "'@#{name}'"
+      end
     end
   end
 end

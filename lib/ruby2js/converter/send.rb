@@ -338,7 +338,11 @@ module Ruby2JS
         put "#{empty_command ? method : command }"
         if !SELENIUM_COMMANDS[method].include?('<locator>')
           if args.length <= 1
-            put "("; parse_all(*args, join: ', '); put ')';
+            if method.to_s.eql?('env_variable') 
+              put args.first.children.last.to_s
+            else
+              put "("; parse_all(*args, join: ', '); put ')';
+            end
           else
             compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
           end

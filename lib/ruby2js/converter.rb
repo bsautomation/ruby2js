@@ -32,7 +32,9 @@ module Ruby2JS
 
     METHODS= {
       'include': '.includes',
-      'size': '.length'
+      'size': '.length',
+      'downcase': '.toLowerCase',
+      'upcase': '.toUpperCase'
     }
 
     GROUP_OPERATORS = [:begin, :dstr, :dsym, :and, :or, :casgn, :if]
@@ -179,6 +181,7 @@ module Ruby2JS
       :click_element_and_select_value => '',
       :send_devtools_cmd => '',
       :sleep => 'await browser.pause',
+      :env_variable => 'browser.globals.'
     }
 
     attr_accessor :binding, :ivars, :namespace
