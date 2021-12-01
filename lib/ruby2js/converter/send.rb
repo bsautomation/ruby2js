@@ -334,22 +334,35 @@ module Ruby2JS
       elsif SELENIUM_COMMANDS.keys.include?(method)
         (group_receiver ? group(receiver) : parse(receiver))
         empty_command = SELENIUM_COMMANDS[method].empty?
-        put "#{empty_command ? method : SELENIUM_COMMANDS[method] }"
+        command = SELENIUM_COMMANDS[method].include?('<locator>') ? SELENIUM_COMMANDS[method].gsub('<locator>', "'@#{args.first.children.last.to_s}'") : SELENIUM_COMMANDS[method]
+        put "#{empty_command ? method : command }"
+        if !SELENIUM_COMMANDS[method].include?('<locator>')
+          if args.length <= 1
+            put "("; parse_all(*args, join: ', '); put ')';
+          else
+            compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
+          end
+        end
+        put ' // This method is not yet implemented' if empty_command
+
+      elsif METHODS.keys.include?(method)
+        (group_receiver ? group(receiver) : parse(receiver))
+        put METHODS[method]
+        if args.length <= 1
+          put "("; parse_all(*args, join: ', '); put ')'
+        else
+          compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
+        end
+
+      elsif ASSERT_COMMANDS.keys.include?(method)
+        empty_command = ASSERT_COMMANDS[method].empty?
+        put "#{empty_command ? method : ASSERT_COMMANDS[method] }"
         if args.length <= 1
           put "("; parse_all(*args, join: ', '); put ')';
         else
           compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
         end
         put ' // This method is not yet implemented' if empty_command
-
-      elsif method == :include or method.to_s.include?('include')
-        (group_receiver ? group(receiver) : parse(receiver))
-        put '.includes'
-        if args.length <= 1
-          put "("; parse_all(*args, join: ', '); put ')'
-        else
-          compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
-        end
 
       else
         if method == :bind and receiver&.type == :send

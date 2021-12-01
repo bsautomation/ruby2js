@@ -30,9 +30,32 @@ module Ruby2JS
       :=== => :'!=='
     }
 
+    METHODS= {
+      'include': '.includes',
+      'size': '.length'
+    }
+
     GROUP_OPERATORS = [:begin, :dstr, :dsym, :and, :or, :casgn, :if]
 
     VASGN = [:cvasgn, :ivasgn, :gvasgn, :lvasgn]
+
+    ASSERT_COMMANDS = {
+      :assert_empty => 'assert',
+      :assert_json => '',
+      :assert_not_contains => 'assert.notInclude',
+      :assert_greater_than_equal_to => 'assert.isAbove',
+      :assert_true => 'assert.isTrue',
+      :assert_false => 'assert.isNotTrue',
+      :assert_json_array => '',
+      :assert_float_equals => '',
+      :assert_nil => 'assert.exists',
+      :assert_not_nil => 'assert.notExists',
+      :assert_include => 'assert.include',
+      :assert_equals => 'assert.equal',
+      :assert_not_include => 'assert.notInclude',
+      :assert_less_than_equal_to => 'assert.isBelow',
+      :assert_equals_with_or => '',
+    }
 
     SELENIUM_COMMANDS= {
       :get_element_or_exception => '',
