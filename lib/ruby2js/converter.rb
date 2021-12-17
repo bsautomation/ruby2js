@@ -34,7 +34,8 @@ module Ruby2JS
       'include': '.includes',
       'size': '.length',
       'downcase': '.toLowerCase',
-      'upcase': '.toUpperCase'
+      'upcase': '.toUpperCase',
+      'each': 'forEach',
     }
 
     GROUP_OPERATORS = [:begin, :dstr, :dsym, :and, :or, :casgn, :if]
@@ -59,15 +60,34 @@ module Ruby2JS
       :assert_equals_with_or => '',
     }
 
-    SELENIUM_COMMANDS= {
+    SELENIUM_COMMANDS = {
+      :attribute => 'await this.elementIdAttribute',
+      :clear => 'await this.elementIdClear',
+      :click => 'await this.elementIdClick',
+      :displayed? => 'await this.elementIdDisplayed',
+      :enabled? => 'await this.elementIdEnabled',
+      :location => 'await this.elementIdLocation',
+      :selected? => 'await this.elementIdSelected',
+      :text => 'await this.elementIdText',
+      :element_click => 'await this.elementIdClick',
+      :element_click_js => 'await this.elementIdClick',
+      :element_displayed? => 'await this.elementIdDisplayed',
+      :element_displayed_js? => 'await this.elementIdDisplayed',
+      :element_attribute => 'await this.elementIdAttribute',
+      :element_text => 'await this.elementIdText',
+      :element_value => 'await this.elementIdValue',
+      :element_not_displayed => '!await this.elementIdDisplayed',
+    }
+
+    WEBDRIVER_HELPER_COMMANDS= {
       :get_element_or_exception => '',
       :visible_element => 'await this.isVisible',
-      :get_elements => 'await this.elements',
+      :get_elements => 'await this.findElements',
       :wait_for_element_visibility => 'await this.waitForElementVisible',
       :element_displayed? => 'await this.isVisible',
       :wait_for_element => 'await this.waitForElementPresent',
       :get_parent_element => '',
-      :get_child_element => 'await this.findElement',
+      :get_child_element => 'await this.getChildElement',
       :get_child_elements => 'await this.findElements',
       :get_image_natural_width => '',
       :page_refresh => 'await browser.refresh',
@@ -131,7 +151,7 @@ module Ruby2JS
       :drag_and_drop_from_on => '',
       :element_text => 'await this.getText',
       :element_value => 'await this.getAttribute(<locator>, "value")',
-      :switch_frame => 'await frame',
+      :switch_frame => 'await this.frame',
       :switch_to_default => '',
       :get_console_logs => 'await browser.getLog',
       :get_elements_text_list => '',
@@ -181,7 +201,8 @@ module Ruby2JS
       :click_element_and_select_value => '',
       :send_devtools_cmd => '',
       :sleep => 'await browser.pause',
-      :env_variable => 'browser.globals.'
+      :env_variable => 'browser.globals.',
+      :set_env_variable => 'browser.globals.'
     }
 
     attr_accessor :binding, :ivars, :namespace

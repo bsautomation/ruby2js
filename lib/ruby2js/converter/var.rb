@@ -8,7 +8,7 @@ module Ruby2JS
       if var == :$!
         put '$EXCEPTION'
       else
-        put var
+        put var.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase}
       end
     end
   end

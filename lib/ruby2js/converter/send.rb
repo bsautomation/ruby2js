@@ -39,7 +39,7 @@ module Ruby2JS
       end
 
       # strip '!' and '?' decorations
-      method = method.to_s[0..-2] if method =~ /\w[!?]$/ && !SELENIUM_COMMANDS.keys.include?(method)
+      method = method.to_s[0..-2] if method =~ /\w[!?]$/ && !WEBDRIVER_HELPER_COMMANDS.keys.include?(method)
 
       # anonymous class
       if method == :new and receiver and receiver.children == [nil, :Class] and
@@ -331,12 +331,48 @@ module Ruby2JS
       elsif ast.children[1] == :instance_of? and receiver and args.length == 1
         put '('; parse s(:send, s(:attr, receiver, :constructor), :==, args.first); put ')'
 
-      elsif SELENIUM_COMMANDS.keys.include?(method)
+      elsif SELENIUM_COMMANDS.keys.include?(method) && !args.join(',').include?('const')
+        if !WEBDRIVER_HELPER_COMMANDS.keys.include?(method) && !receiver.nil?
+          empty_command = SELENIUM_COMMANDS[method].empty?
+          command = SELENIUM_COMMANDS[method]
+          put "#{empty_command ? method : command }"
+          put "("; parse(receiver); put '.getId()' ;
+        else
+          (group_receiver ? group(receiver) : parse(receiver))
+          empty_command = SELENIUM_COMMANDS[method].empty?
+          command = SELENIUM_COMMANDS[method]
+          put "#{empty_command ? method : command }"
+          put "("; put "#{args[0].to_a.first.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase}}.getId()"
+          args.shift
+        end
+        if args.length > 0
+          compact { put ', '; parse_all(*args, join: ",#@ws"); sput ')';}
+        else
+          put ')'
+        end
+
+      elsif method.to_s.eql?('get_child_element') || method.to_s.eql?('get_child_elements') || args.join(',').include?('get_child_element')
         (group_receiver ? group(receiver) : parse(receiver))
-        empty_command = SELENIUM_COMMANDS[method].empty?
-        command = SELENIUM_COMMANDS[method].include?('<locator>') ? SELENIUM_COMMANDS[method].gsub('<locator>', "'@#{args.first.children.last.to_s}'") : SELENIUM_COMMANDS[method]
+        if !args.join(',').include?('get_child_element')
+          command = WEBDRIVER_HELPER_COMMANDS[method]
+          put command
+        else
+          put SELENIUM_COMMANDS[method]
+        end
+        if args.length <= 1
+          put "("; parse_all(*args, join: ', '); put ')';
+        else
+          compact { puts "("; put "#{args[0].to_a.last.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase}}.getId(), "; 
+          put "this.elements.#{args[1].to_a.last.to_s}.locateStrategy, "; put "this.elements.#{args[1].to_a.last.to_s}.selector"; sput ')';}
+        end
+
+      elsif WEBDRIVER_HELPER_COMMANDS.keys.include?(method)
+        (group_receiver ? group(receiver) : parse(receiver))
+        locator_present = WEBDRIVER_HELPER_COMMANDS[method].include?('<locator>') 
+        empty_command = WEBDRIVER_HELPER_COMMANDS[method].empty?
+        command = locator_present ? WEBDRIVER_HELPER_COMMANDS[method].gsub('<locator>', "'@#{args.first.children.last.to_s}'") : WEBDRIVER_HELPER_COMMANDS[method]
         put "#{empty_command ? method : command }"
-        if !SELENIUM_COMMANDS[method].include?('<locator>')
+        if !locator_present
           if args.length <= 1
             if method.to_s.eql?('env_variable') 
               put args.first.children.last.to_s
@@ -347,7 +383,6 @@ module Ruby2JS
             compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
           end
         end
-        put ' // This method is not yet implemented' if empty_command
 
       elsif METHODS.keys.include?(method)
         (group_receiver ? group(receiver) : parse(receiver))
@@ -366,7 +401,6 @@ module Ruby2JS
         else
           compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
         end
-        put ' // This method is not yet implemented' if empty_command
 
       else
         if method == :bind and receiver&.type == :send
@@ -396,7 +430,6 @@ module Ruby2JS
           else
             compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
           end
-          put " // This method is not yet implemented"
         end
 
         if autobind and not ast.is_method? and ast.type != :attr

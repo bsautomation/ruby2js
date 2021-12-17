@@ -49,9 +49,9 @@ module Ruby2JS
         end
 
         if value
-          put "#{ var }#{ name } = "; parse value
+          put "#{ var }#{ name.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase} } = "; parse value
         else
-          put "#{ var }#{ name }"
+          put "#{ var }#{ name.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase} }"
         end
 
         if not hoist

@@ -164,7 +164,7 @@ module Ruby2JS
           put @prop
           @prop = nil
         elsif name
-          put "function #{name.to_s.sub(/[?!]$/, '')}"
+          put "async #{name.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase}}"
         else
           put 'function'
         end

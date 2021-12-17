@@ -8,7 +8,7 @@ module Ruby2JS
 
     handle :arg, :blockarg do |arg, unknown=nil|
       raise Error.new("argument #{ unknown.inspect }", @ast) if unknown
-      put arg
+      put arg.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase}
     end
 
     # (shadowarg :a)
