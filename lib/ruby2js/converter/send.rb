@@ -333,11 +333,11 @@ module Ruby2JS
 
       elsif receiver && receiver.to_a[1].eql?(:expect) && method.eql?(:to)
         (group_receiver ? group(receiver) : parse(receiver))
-        put ".#{method}"
+        put ".#{method}."
         if args.length <= 1
           parse_all(*args, join: ', ')
         else
-          put '.'; put args.first.to_a[1].to_s; put args.first.to_a.last.to_s.gsub(')',',');
+          put args.first.to_a[1].to_s; put args.first.to_a.last.to_s.gsub(')',',');
           put "'#{args.last.to_a.first}'"; put ')'
         end
 

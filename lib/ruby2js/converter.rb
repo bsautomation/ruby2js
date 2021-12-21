@@ -31,7 +31,6 @@ module Ruby2JS
     }
 
     METHODS= {
-      'include': '.includes',
       'size': '.length',
       'downcase': '.toLowerCase',
       'upcase': '.toUpperCase',
