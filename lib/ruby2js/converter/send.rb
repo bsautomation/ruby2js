@@ -331,6 +331,16 @@ module Ruby2JS
       elsif ast.children[1] == :instance_of? and receiver and args.length == 1
         put '('; parse s(:send, s(:attr, receiver, :constructor), :==, args.first); put ')'
 
+      elsif receiver && receiver.to_a[1].eql?(:expect) && method.eql?(:to)
+        (group_receiver ? group(receiver) : parse(receiver))
+        put ".#{method}."
+        if args.length <= 1
+          parse_all(*args, join: ', ')
+        else
+          put args.first.to_a[1].to_s; put args.first.to_a.last.to_s.gsub(')',',');
+          put "'#{args.last.to_a.first}'"; put ')'
+        end
+
       elsif SELENIUM_COMMANDS.keys.include?(method) && !args.join(',').include?('const')
         if !WEBDRIVER_HELPER_COMMANDS.keys.include?(method) && !receiver.nil?
           empty_command = SELENIUM_COMMANDS[method].empty?
