@@ -341,6 +341,13 @@ module Ruby2JS
           put "'#{args.last.to_a.first}'"; put ')'
         end
 
+      elsif SELENIUM_COMMANDS.keys.include?(method) && WEBDRIVER_HELPER_COMMANDS.keys.include?(args[0].to_a[1]) && args[0].to_a.last.to_s.include?('const')
+        (group_receiver ? group(receiver) : parse(receiver))
+        empty_command = WEBDRIVER_HELPER_COMMANDS[method].empty?
+        command = WEBDRIVER_HELPER_COMMANDS[method]
+        put "#{empty_command ? method : command }"
+        put "("; put "'@#{args[0].to_a.last.to_a.last.to_s}'"; put ')'
+
       elsif SELENIUM_COMMANDS.keys.include?(method) && !args.join(',').include?('const')
         if !WEBDRIVER_HELPER_COMMANDS.keys.include?(method) && !receiver.nil?
           empty_command = SELENIUM_COMMANDS[method].empty?

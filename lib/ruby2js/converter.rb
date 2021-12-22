@@ -34,7 +34,7 @@ module Ruby2JS
       'size': '.length',
       'downcase': '.toLowerCase',
       'upcase': '.toUpperCase',
-      'each': 'forEach',
+      'each': '.forEach',
     }
 
     GROUP_OPERATORS = [:begin, :dstr, :dsym, :and, :or, :casgn, :if]
