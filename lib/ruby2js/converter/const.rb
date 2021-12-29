@@ -19,6 +19,8 @@ module Ruby2JS
       
       if name.to_s.eql?('ENV')
         put "browser.globals"
+      elsif name.to_s.eql?('JSON')
+        put ""
       else
         put "'@#{name}'"
       end

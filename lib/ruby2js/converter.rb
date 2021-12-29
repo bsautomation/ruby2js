@@ -30,11 +30,18 @@ module Ruby2JS
       :=== => :'!=='
     }
 
+    HELPER_METHODS = {
+      :make_request => 'await restHelper.make_request',
+    }
+
     METHODS= {
       'size': '.length',
       'downcase': '.toLowerCase',
       'upcase': '.toUpperCase',
       'each': '.forEach',
+      'parse': '',
+      'eql': ' === ',
+      'eql?': ' === ',
     }
 
     GROUP_OPERATORS = [:begin, :dstr, :dsym, :and, :or, :casgn, :if]

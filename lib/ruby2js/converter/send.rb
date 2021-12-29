@@ -341,6 +341,17 @@ module Ruby2JS
           put "'#{args.last.to_a.first}'"; put ')'
         end
 
+      elsif HELPER_METHODS.keys.include?(method)
+        (group_receiver ? group(receiver) : parse(receiver))
+        put HELPER_METHODS[method]; put '('
+        args.each_with_index do |arg, index|
+          if index == 1
+            put "'', "
+          end
+          parse(arg);
+          put(((args.size - 1) == index) ? ')' : ', ')
+        end
+
       elsif SELENIUM_COMMANDS.keys.include?(method) && WEBDRIVER_HELPER_COMMANDS.keys.include?(args[0].to_a[1]) && args[0].to_a.last.to_s.include?('const')
         (group_receiver ? group(receiver) : parse(receiver))
         empty_command = WEBDRIVER_HELPER_COMMANDS[method].empty?
@@ -401,13 +412,19 @@ module Ruby2JS
           end
         end
 
-      elsif METHODS.keys.include?(method)
+      elsif METHODS.keys.include?(method) || METHODS.keys.include?(method.to_sym)
         (group_receiver ? group(receiver) : parse(receiver))
-        put METHODS[method]
-        if args.length <= 1
-          put "("; parse_all(*args, join: ', '); put ')'
+        if(method.to_s.eql?('parse'))
+          parse_all(*args, join: ', ')
         else
-          compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
+          put METHODS[method.to_sym]
+          if method.to_s.include?('eql')
+            parse_all(*args, join: ', ')
+          elsif args.length <= 1
+            put "("; parse_all(*args, join: ', '); put ')'
+          else
+            compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
+          end
         end
 
       elsif ASSERT_COMMANDS.keys.include?(method)
