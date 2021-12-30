@@ -22,7 +22,7 @@ module Ruby2JS
       elsif name.to_s.eql?('JSON')
         put ""
       else
-        put "'@#{name}'"
+        put name
       end
     end
   end
