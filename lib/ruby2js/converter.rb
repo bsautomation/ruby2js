@@ -47,6 +47,7 @@ module Ruby2JS
       'parse': '',
       'eql': ' === ',
       'nil': '',
+      'empty': '',
       'include': '.includes',
       'to_i': 'parseInt',
       'to_f': 'parseFloat',

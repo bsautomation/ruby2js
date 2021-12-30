@@ -86,33 +86,10 @@ module Ruby2JS
             exceptions, var, recovery = recover.children
             var ||= s(:gvar, :$EXCEPTION)
 
-            if exceptions
-
-              put "} else " if not first
-              first = false
-
-              put  'if ('
-              exceptions.children.each_with_index do |exception, index|
-                put ' || ' unless index == 0
-                if exception == s(:const, nil, :String)
-                  put 'typeof '; parse var; put ' == "string"'
-                else
-                  parse var; put ' instanceof '; parse exception
-                end
-              end
-              puts ') {'
-            else
-              puts '} else {'
-            end
-
             scope recovery; puts ''
           end
 
-          if recovers.last.children.first
-            puts "} else {"; put 'throw '; parse var; puts ''
-          end
-
-          puts '}'; put '}'
+          put '}'
         end
       end
 
