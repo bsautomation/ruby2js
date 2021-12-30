@@ -407,6 +407,8 @@ module Ruby2JS
           if args.length <= 1
             if method.to_s.eql?('env_variable') 
               put args.first.children.last.to_s
+            elsif method.to_s.eql?('sleep')
+              put "constantWaits.#{args.first.children.last.to_s}"
             else
               put "("
               args.each do |arg|

@@ -216,7 +216,8 @@ module Ruby2JS
       :send_devtools_cmd => '',
       :sleep => 'await browser.pause',
       :env_variable => 'browser.globals.',
-      :set_env_variable => 'browser.globals.'
+      :set_env_variable => 'browser.globals.',
+      :visit_url_in_new_tab => 'await webDriverHelper.visitURLInNewTab',
     }
 
     attr_accessor :binding, :ivars, :namespace
