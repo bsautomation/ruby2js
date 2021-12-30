@@ -357,7 +357,10 @@ module Ruby2JS
         empty_command = WEBDRIVER_HELPER_COMMANDS[method].empty?
         command = WEBDRIVER_HELPER_COMMANDS[method]
         put "#{empty_command ? method : command }"
-        put "("; put "'@#{args[0].to_a.last.to_a.last.to_s}'"; put ')'
+        put "("; put "'@#{args[0].to_a.last.to_a.last.to_s}'"
+        args.delete(args.first)
+        parse_all(*args, join: ', ') if args.size > 0
+        put ')'
 
       elsif SELENIUM_COMMANDS.keys.include?(method) && !args.join(',').include?('const')
         if !WEBDRIVER_HELPER_COMMANDS.keys.include?(method) && !receiver.nil?
@@ -405,7 +408,15 @@ module Ruby2JS
             if method.to_s.eql?('env_variable') 
               put args.first.children.last.to_s
             else
-              put "("; parse_all(*args, join: ', '); put ')';
+              put "("
+              args.each do |arg|
+                if arg.type == :const
+                  put "@#{args[0].children.last.to_s}"
+                  args.delete(arg)
+                end
+              end
+              parse_all(*args, join: ', ') if args.size > 0
+              put ')'
             end
           else
             compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
@@ -418,14 +429,16 @@ module Ruby2JS
           parse_all(*args, join: ', ')
         else
           put "#{RUBY_TO_JS_METHODS[method.to_sym]}"
-          if method.to_s.include?('eql')
-            parse_all(*args, join: ', ')
-          elsif args.length <= 1
-            put "("
-            (group_receiver ? group(receiver) : parse(receiver)) if REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym)
-            parse_all(*args, join: ', '); put ')'
-          else
-            compact { puts "("; (group_receiver ? group(receiver) : parse(receiver)) if REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym); parse_all(*args, join: ",#@ws"); sput ')' }
+          unless RUBY_TO_JS_METHODS[method.to_sym].empty?
+            if method.to_s.include?('eql')
+              parse_all(*args, join: ', ')
+            elsif args.length <= 1
+              put "("
+              (group_receiver ? group(receiver) : parse(receiver)) if REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym)
+              parse_all(*args, join: ', '); put ')'
+            else
+              compact { puts "("; (group_receiver ? group(receiver) : parse(receiver)) if REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym); parse_all(*args, join: ",#@ws"); sput ')' }
+            end
           end
         end
 
