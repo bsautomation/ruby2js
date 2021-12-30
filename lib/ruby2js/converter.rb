@@ -34,7 +34,12 @@ module Ruby2JS
       :make_request => 'await restHelper.make_request',
     }
 
-    METHODS= {
+    REVERSE_PARSE_RUBY_TO_JS_METHODS = {
+      'to_i': 'parseInt',
+      'to_f': 'parseFloat',
+    }
+
+    RUBY_TO_JS_METHODS= {
       'size': '.length',
       'downcase': '.toLowerCase',
       'upcase': '.toUpperCase',
@@ -42,6 +47,9 @@ module Ruby2JS
       'parse': '',
       'eql': ' === ',
       'eql?': ' === ',
+      'include': '.includes',
+      'to_i': 'parseInt',
+      'to_f': 'parseFloat',
     }
 
     GROUP_OPERATORS = [:begin, :dstr, :dsym, :and, :or, :casgn, :if]

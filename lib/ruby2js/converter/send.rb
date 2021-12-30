@@ -412,18 +412,20 @@ module Ruby2JS
           end
         end
 
-      elsif METHODS.keys.include?(method) || METHODS.keys.include?(method.to_sym)
-        (group_receiver ? group(receiver) : parse(receiver))
+      elsif RUBY_TO_JS_METHODS.keys.include?(method) || RUBY_TO_JS_METHODS.keys.include?(method.to_sym)
+        (group_receiver ? group(receiver) : parse(receiver)) if !REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym)
         if(method.to_s.eql?('parse'))
           parse_all(*args, join: ', ')
         else
-          put METHODS[method.to_sym]
+          put "#{RUBY_TO_JS_METHODS[method.to_sym]}"
           if method.to_s.include?('eql')
             parse_all(*args, join: ', ')
           elsif args.length <= 1
-            put "("; parse_all(*args, join: ', '); put ')'
+            put "("
+            (group_receiver ? group(receiver) : parse(receiver)) if REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym)
+            parse_all(*args, join: ', '); put ')'
           else
-            compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')' }
+            compact { puts "("; (group_receiver ? group(receiver) : parse(receiver)) if REVERSE_PARSE_RUBY_TO_JS_METHODS.include?(method.to_sym); parse_all(*args, join: ",#@ws"); sput ')' }
           end
         end
 
@@ -457,7 +459,7 @@ module Ruby2JS
             (receiver || s(:nil)), s(:array, *args))
         else
           (group_receiver ? group(receiver) : parse(receiver))
-          put "#{ '.' if receiver && method}#{ method }"
+          put "#{ '.' if receiver && method}#{ method.to_s.gsub(/(?!^)_[a-z0-9]/) {|match| match[1].upcase} }"
 
           if args.length <= 1
             put "("; parse_all(*args, join: ', '); put ')'
