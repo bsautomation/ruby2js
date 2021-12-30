@@ -359,7 +359,7 @@ module Ruby2JS
         put "#{empty_command ? method : command }"
         put "("; put "'@#{args[0].to_a.last.to_a.last.to_s}'"
         args.delete(args.first)
-        parse_all(*args, join: ', ') if args.size > 0
+        put ', '; parse_all(*args, join: ', ') if args.size > 0
         put ')'
 
       elsif SELENIUM_COMMANDS.keys.include?(method) && !args.join(',').include?('const')
@@ -411,7 +411,7 @@ module Ruby2JS
               put "("
               args.each do |arg|
                 if arg.type == :const
-                  put "@#{args[0].children.last.to_s}"
+                  put "'@#{args[0].children.last.to_s}'"
                   args.delete(arg)
                 end
               end
