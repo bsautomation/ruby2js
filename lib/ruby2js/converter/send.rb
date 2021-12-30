@@ -408,7 +408,7 @@ module Ruby2JS
             if method.to_s.eql?('env_variable') 
               put args.first.children.last.to_s
             elsif method.to_s.eql?('sleep')
-              put "constantWaits.#{args.first.children.last.to_s}"
+              put "(constantWaits.#{args.first.children.last.to_s})"
             else
               put "("
               args.each do |arg|
@@ -447,6 +447,15 @@ module Ruby2JS
       elsif ASSERT_COMMANDS.keys.include?(method)
         empty_command = ASSERT_COMMANDS[method].empty?
         put "#{empty_command ? method : ASSERT_COMMANDS[method] }"
+        if args.length <= 1
+          put "("; parse_all(*args, join: ', '); put ')';
+        else
+          compact { puts "("; parse_all(*args, join: ",#@ws"); sput ')';}
+        end
+
+      elsif HELPER_COMMANDS.keys.include?(method.to_sym)
+        (group_receiver ? group(receiver) : parse(receiver))
+        put HELPER_COMMANDS[method.to_sym]
         if args.length <= 1
           put "("; parse_all(*args, join: ', '); put ')';
         else

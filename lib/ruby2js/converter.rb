@@ -93,6 +93,11 @@ module Ruby2JS
       :element_not_displayed => '!await this.elementIdDisplayed',
     }
 
+    HELPER_COMMANDS = {
+      :production => 'environmentHelper.isProduction',
+      :production_sanity => 'environmentHelper.isProductionSanity',
+    }
+
     WEBDRIVER_HELPER_COMMANDS= {
       :get_element_or_exception => '',
       :visible_element => 'await this.isVisible',
